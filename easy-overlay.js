@@ -194,6 +194,9 @@ var easyOverlay=(function(){
 	}
 
 	function overlayPrepare($content,options,self){
+		if(options.autofocus === true) {
+			autofocus($content);
+		}
 		if (cls.overlayCallAll){
 			cls.overlayCallAll.call(cls,$content);
 		}
@@ -218,6 +221,15 @@ var easyOverlay=(function(){
 		if (options.foreground){
 			foreground($(options.foreground),$content);
 		}
+	}
+
+	function autofocus($content) {
+		$content.find('form input, form textarea').each(function() {
+			if($(this).attr('type') != 'hidden' && $(this).val() == '') {
+				$(this).focus();
+				return false;
+			}
+		});
 	}
 
 // cls
@@ -284,6 +296,7 @@ var easyOverlay=(function(){
 				};
 			}
 			count++;
+			options.autofocus = options.autofocus === undefined ? true : options.autofocus;
 			options.css = options.css===false ? {} : $.extend(css.content, options.css);
 			options.css['z-index'] = 50 + (count*5)+1;
 
