@@ -260,7 +260,10 @@ var easyOverlay=(function(){
 					return;
 				}
 				if (options.closeCallback){
-					options.closeCallback($overlay);
+					var returnValue = options.closeCallback($overlay);
+					if (returnValue===false){
+						return;
+					}
 				}
 				if (options.closeSubmit){
 					closeSubmit($overlay);
