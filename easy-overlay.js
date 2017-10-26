@@ -141,7 +141,7 @@ var easyOverlay=(function(){
 
 	function submitError(errors,$form){
 		var callback;
-		
+
 		$.each(errors,function(key,error){
 			var $input={};
 			if (isNaN(key)){
@@ -260,7 +260,10 @@ var easyOverlay=(function(){
 					return;
 				}
 				if (options.closeCallback){
-					options.closeCallback($overlay);
+					var returnValue = options.closeCallback($overlay);
+					if (returnValue===false){
+						return;
+					}
 				}
 				if (options.closeSubmit){
 					closeSubmit($overlay);
@@ -290,7 +293,7 @@ var easyOverlay=(function(){
 			var $overlay = this.createBackground(options).data(options).click(function(){
 				self.close($(this), (options && options.history) ? false : true);
 			});
-			
+
 			if (count>1){
 				overflows[count] = $('#overlay'+(count-1)).css('overflow');
 				$('#overlay'+(count-1)).css({overflow: 'hidden'});
@@ -362,6 +365,7 @@ var easyOverlay=(function(){
 				$overlay.css('height', $body.height()>windowHeight ? $body.height() : windowHeight);
 				$body.scrollTop(0);
 			}
+			self.options = options;
 		}
 		,createBackground: function(options, zOffset){
 			if (typeof options!='object'){
@@ -409,6 +413,9 @@ var easyOverlay=(function(){
 		}
 		,submit:function(ajax, url, callback, $submit, $form){
 			var self = this;
+			if (self.options && typeof self.options.beforeSubmit==='function'){
+				self.options.beforeSubmit($form, $submit, ajax);
+			}
 			$.ajax({
 				type: 'POST'
 				,url: url
@@ -463,6 +470,7 @@ var easyOverlay=(function(){
 			var query = $(this).attr('href').trim().appendQuery('ajax=1');
 			options.load=query;
 			options.data=false;
+			$(this).blur();
 			cls.create(options);
 		}
 		,submit:function(e){
