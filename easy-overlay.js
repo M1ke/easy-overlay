@@ -468,13 +468,12 @@ var easyOverlay=(function(){
 		,submit:function(e){
 			e && e.preventDefault();
 			var $form=$(this).css('cursor','wait')
-				,$submit=$(this).find('input[type="submit"]').prop('disabled',true).addClass('disabled')
-				,ajax=[]
+				,$submit=$(this).find('[type="submit"]').prop('disabled',true).addClass('disabled')
 				,url=$form.attr('action').replace('db_','ajax_').appendQuery('easy-overlay-submit=1');
 
 			cls.jq.clearErrors($form);
 
-			ajax=$form.find(':not([type="submit"])[name]').serialize();
+			var ajax=$form.find(':not([type="submit"])[name]').serialize();
 			var $clickedSubmit = $submit.filter('[clicked="true"]');
 			if ($clickedSubmit.length>0){
 				ajax += '&'+$clickedSubmit.attr('name')+'='+$clickedSubmit.val();
