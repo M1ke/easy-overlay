@@ -65,7 +65,7 @@ var easyOverlay=(function(){
 		}
 		$overlay.remove();
 		if (count>1){
-			$('#overlay'+(count-1)).css({overflow: overflows[count]});
+			$('#overlay'+(count-1)).css(overflows[count] ? overflows[count] : {});
 		}
 		else {
 			$('body').css((overflows[1] && overflows[1].overflow) ? overflows[1] : {overflow: 'visible', position: 'static'});
@@ -295,15 +295,22 @@ var easyOverlay=(function(){
 			});
 
 			if (count>1){
-				overflows[count] = $('#overlay'+(count-1)).css('overflow');
-				$('#overlay'+(count-1)).css({overflow: 'hidden'});
+				var $previousOverlay = $('#overlay'+(count-1));
+				overflows[count] = {
+					overflow: $previousOverlay.css('overflow')
+					,'overflow-x': $previousOverlay.css('overflow-x')
+					,'overflow-y': $previousOverlay.css('overflow-y')
+					,position: $previousOverlay.css('position')
+				};
+				$previousOverlay.css({overflow: 'hidden'});
 			}
 			else {
+				var $overflowBody = $('body');
 				overflows[count] = {
-					overflow: $('body').css('overflow')
-					,'overflow-x': $('body').css('overflow-x')
-					,'overflow-y': $('body').css('overflow-y')
-					,position: $('body').css('position')
+					overflow: $overflowBody.css('overflow')
+					,'overflow-x': $overflowBody.css('overflow-x')
+					,'overflow-y': $overflowBody.css('overflow-y')
+					,position: $overflowBody.css('position')
 				};
 				if (!options.scroll){
 					var bodyCss = {
@@ -312,7 +319,7 @@ var easyOverlay=(function(){
 					if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i)){
 						bodyCss.position = 'fixed';
 					}
-					$('body').css(bodyCss);
+					$overflowBody.css(bodyCss);
 				}
 			}
 
