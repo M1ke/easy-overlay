@@ -457,7 +457,17 @@ var easyOverlay=(function(){
 			return css;
 		}
 		,overflows:function(){
-			return overflows;
+			// this is in order to preserve the old behaviour/output
+			var overflowsOut = [];
+			for (var key in overflows){
+				// in general only want the overflow value, not the whole object [to match old behaviour]
+				overflowsOut[key] = overflows[key].overflow;
+			}
+			if (overflows[1]){
+				// for 1, i.e. the body, we do want the full list
+				overflowsOut[1] = overflows[1];
+			}
+			return overflowsOut;
 		}
 	};
 
