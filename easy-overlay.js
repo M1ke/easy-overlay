@@ -64,11 +64,11 @@ var easyOverlay=(function(){
 			window.history.back();
 		}
 		$overlay.remove();
-		if (count>1){
-			$('#overlay'+(count-1)).css(overflows[count] ? overflows[count] : {});
-		}
-		else {
+		if (count<=1){
 			$('body').css((overflows[1] && overflows[1].overflow) ? overflows[1] : {overflow: 'visible', position: 'static'});
+		}
+		else if (overflows[count]) {
+			$('#overlay'+(count-1)).css(overflows[count]);
 		}
 		count--;
 	}
