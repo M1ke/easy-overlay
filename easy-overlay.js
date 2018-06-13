@@ -64,11 +64,11 @@ var easyOverlay=(function(){
 			window.history.back();
 		}
 		$overlay.remove();
-		if (count>1){
-			$('#overlay'+(count-1)).css({overflow: overflows[count]});
-		}
-		else {
+		if (count<=1){
 			$('body').css((overflows[1] && overflows[1].overflow) ? overflows[1] : {overflow: 'visible', position: 'static'});
+		}
+		else if (overflows[count]) {
+			$('#overlay'+(count-1)).css(overflows[count]);
 		}
 		count--;
 	}
@@ -295,15 +295,22 @@ var easyOverlay=(function(){
 			});
 
 			if (count>1){
-				overflows[count] = $('#overlay'+(count-1)).css('overflow');
-				$('#overlay'+(count-1)).css({overflow: 'hidden'});
+				var $previousOverlay = $('#overlay'+(count-1));
+				overflows[count] = {
+					overflow: $previousOverlay.css('overflow')
+					,'overflow-x': $previousOverlay.css('overflow-x')
+					,'overflow-y': $previousOverlay.css('overflow-y')
+					,position: $previousOverlay.css('position')
+				};
+				$previousOverlay.css({overflow: 'hidden'});
 			}
 			else {
+				var $overflowBody = $('body');
 				overflows[count] = {
-					overflow: $('body').css('overflow')
-					,'overflow-x': $('body').css('overflow-x')
-					,'overflow-y': $('body').css('overflow-y')
-					,position: $('body').css('position')
+					overflow: $overflowBody.css('overflow')
+					,'overflow-x': $overflowBody.css('overflow-x')
+					,'overflow-y': $overflowBody.css('overflow-y')
+					,position: $overflowBody.css('position')
 				};
 				if (!options.scroll){
 					var bodyCss = {
@@ -312,7 +319,7 @@ var easyOverlay=(function(){
 					if (navigator.userAgent.match(/iPhone/i) || navigator.userAgent.match(/iPod/i)){
 						bodyCss.position = 'fixed';
 					}
-					$('body').css(bodyCss);
+					$overflowBody.css(bodyCss);
 				}
 			}
 
@@ -450,7 +457,17 @@ var easyOverlay=(function(){
 			return css;
 		}
 		,overflows:function(){
-			return overflows;
+			// this is in order to preserve the old behaviour/output
+			var overflowsOut = [];
+			for (var key in overflows){
+				// in general only want the overflow value, not the whole object [to match old behaviour]
+				overflowsOut[key] = overflows[key].overflow;
+			}
+			if (overflows[1]){
+				// for 1, i.e. the body, we do want the full list
+				overflowsOut[1] = overflows[1];
+			}
+			return overflowsOut;
 		}
 	};
 
