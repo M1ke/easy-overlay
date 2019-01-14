@@ -139,25 +139,10 @@ var easyOverlay=(function(){
 		}
 	}
 
-	function submitError(errors,$form){
+	function submitError(errors, $form){
 		var callback;
 
-		$.each(errors,function(key,error){
-			var $input={};
-			if (isNaN(key)){
-				key=key.split('-');
-				var name=key[0].replace(/([A-Z])/,'_$1').toLowerCase()
-					,selector=key[1] ? '[name="'+name+'[]"]:nth('+key[1]+')' : '[name="'+name+'"]';
-				$input=$(selector,$form);
-			}
-			if ($input.length>0){
-				$('<strong>'+error+'</strong>').insertAfter($input);
-				$input.addClass('error').parent().addClass('error');
-			}
-			else {
-				$form.prepend('<p class="error">'+error+'</p>')
-			}
-		});
+		cls.jq.inputErrors($form, errors);
 		$('div.overlay:last').scrollTop(0);
 
 		callback = $form.data('callback-error');
@@ -511,6 +496,24 @@ var easyOverlay=(function(){
 				.find('div.error').removeClass('error')
 				.find('strong').remove().end().end()
 				.find('input.error,select.error,textarea.error').removeClass('error').next('strong').remove();
+		},
+		inputErrors: function($context, errors){
+			$.each(errors, function(key, error){
+				var $input = {};
+				if (isNaN(key)){
+					key = key.split('-');
+					var name = key[0].replace(/([A-Z])/, '_$1').toLowerCase()
+						,selector = key[1] ? '[name="'+name+'[]"]:nth('+key[1]+')' : '[name="'+name+'"]';
+					$input = $(selector, $context);
+				}
+				if ($input.length > 0){
+					$('<strong>'+error+'</strong>').insertAfter($input);
+					$input.addClass('error').parent().addClass('error');
+				}
+				else {
+					$context.prepend('<p class="error">'+error+'</p>')
+				}
+			});
 		}
 	};
 
