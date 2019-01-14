@@ -497,13 +497,18 @@ var easyOverlay=(function(){
 				.find('strong').remove().end().end()
 				.find('input.error,select.error,textarea.error').removeClass('error').next('strong').remove();
 		},
-		inputErrors: function($context, errors){
+		inputErrors: function($context, errors, ignoreSplitKeys){
 			$.each(errors, function(key, error){
 				var $input = {};
 				if (isNaN(key)){
 					key = key.split('-');
-					var name = key[0].replace(/([A-Z])/, '_$1').toLowerCase()
+					var name = key[0]
 						,selector = key[1] ? '[name="'+name+'[]"]:nth('+key[1]+')' : '[name="'+name+'"]';
+
+					if (!ignoreSplitKeys){
+						 name = name.replace(/([A-Z])/, '_$1').toLowerCase();
+					}
+
 					$input = $(selector, $context);
 				}
 				if ($input.length > 0){
