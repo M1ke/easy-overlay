@@ -429,10 +429,9 @@ var easyOverlay=(function(){
 						return;
 					}
 
-					var handler;
+					var response;
 					try {
 						response = $.parseJSON(jqXHR.responseText);
-						handler = submitSuccessJson;
 					}
 					catch (e){
 						// The response was not parsed correctly as JSON
@@ -440,7 +439,7 @@ var easyOverlay=(function(){
 						return;
 					}
 
-					submitSuccessJson(self, [response, ajax, callback, $submit, $form, true]);
+					submitSuccessJson(response, ajax, callback, $submit, $form, true);
 				}
 				,complete: function(jqXHR, textStatus){
 					$form.css('cursor', 'default');
