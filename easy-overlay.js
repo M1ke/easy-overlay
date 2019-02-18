@@ -119,7 +119,7 @@ var easyOverlay=(function(){
 		return temp;
 	}
 
-	function submitSuccessJson(response,ajax,callback,$submit,$form){
+	function submitSuccessJson(response,ajax,callback,$submit,$form, isError){
 		if (response.error){
 			if (response.error.alert){
 				alert('Error: '+response.error.alert);
@@ -130,7 +130,7 @@ var easyOverlay=(function(){
 		}
 		else {
 			if (typeof callback=='function'){
-				callback.apply(parseAjax(ajax),[response,$submit]);
+				callback.apply(parseAjax(ajax),[response, $submit, isError]);
 			}
 			else if (callback){
 				// can't pass APP in and keep response?
@@ -403,7 +403,7 @@ var easyOverlay=(function(){
 				this.create(data);
 			}
 		}
-		,submit:function(ajax, url, callback, $submit, $form){
+		,submit:function(ajax, url, callback, $submit, $form, callbackForErrors){
 			var self = this;
 			if (self.options && typeof self.options.beforeSubmit==='function'){
 				self.options.beforeSubmit($form, $submit, ajax);
@@ -424,7 +424,23 @@ var easyOverlay=(function(){
 					handler.apply(self, [response, ajax, callback, $submit, $form]);
 				}
 				,error: function(jqXHR, textStatus, errorThrown){
-					alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
+					if (!callbackForErrors){
+						alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
+						return;
+					}
+
+					var handler;
+					try {
+						response = $.parseJSON(jqXHR.responseText);
+						handler = submitSuccessJson;
+					}
+					catch (e){
+						// The response was not parsed correctly as JSON
+						alert('The website could not be reached; there might be a problem with your connection. Please try again, or check whether you can reach other pages on the website if the problem persists.');
+						return;
+					}
+
+					submitSuccessJson(self, [response, ajax, callback, $submit, $form, true]);
 				}
 				,complete: function(jqXHR, textStatus){
 					$form.css('cursor', 'default');
@@ -489,7 +505,7 @@ var easyOverlay=(function(){
 				ajax += '&'+$clickedSubmit.attr('name')+'='+$clickedSubmit.val();
 				$clickedSubmit.attr('clicked', '');
 			}
-			easyOverlay.submit(ajax,url, $form.data('callback'), $submit, $form);
+			easyOverlay.submit(ajax,url, $form.data('callback'), $submit, $form, $form.data('callbackForErrors'));
 		}
 		,clearErrors: function($form){
 			$form.find('p.error').remove().end()
@@ -543,8 +559,11 @@ $.fn.extend({
 		}
 		return this.unbind('click', easyOverlay.jq.click).data(options).click(easyOverlay.jq.click);
 	}
-	,easyOverlaySubmit: function(callback){
-		return this.unbind('submit', easyOverlay.jq.submit).submit(easyOverlay.jq.submit).data('callback', callback);
+	,easyOverlaySubmit: function(callback, callbackForErrors){
+		return this.unbind('submit', easyOverlay.jq.submit).submit(easyOverlay.jq.submit).data({
+			callback: callback,
+			callbackForErrors: callbackForErrors
+		});
 	}
 	,easyOverlaySubmitOff: function(){
 		return this.unbind('submit', easyOverlay.jq.submit);
